@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 find_package(CUDA QUIET REQUIRED)
+#findCUDAToolkit()
 
 MESSAGE(STATUS "${CUDA_NVCC_FLAGS}")
 
@@ -17,5 +18,5 @@ CUDA_ADD_LIBRARY(
     src/init.cu
     include/init.h
 )
-TARGET_LINK_LIBRARIES(simplecuda ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_CUSPARSE_LIBRARIES})
+TARGET_LINK_LIBRARIES(simplecuda ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY})
 TARGET_INCLUDE_DIRECTORIES(simplecuda PUBLIC include)

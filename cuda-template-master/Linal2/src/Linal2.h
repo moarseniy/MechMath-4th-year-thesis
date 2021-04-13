@@ -58,8 +58,11 @@ public:
 	Matrix Product(Matrix &a);
     MyArray Product(MyArray &v);
 	Matrix & transpose();
-	Matrix & transpose2();
-	Matrix & Gauss();
+
+    void transpose2();
+    void transpose_not_square();
+
+    Matrix & Gauss();
 	double det_gauss();
 	double det(int n);
 	void Get_matrix(int n, Matrix &temp_matr, int indRow, int indCol);	
@@ -105,6 +108,7 @@ public:
     void ConvertTripletToSparse(std::vector<Triplet> t);
     void ConvertToMatrix(Matrix& M);
     void SortIt();
+    void ConvertToCSR(int *ptr, int *ind, double *data_csr, int n);
     void SparseLU();
     void CGM_solve(MyArray B, MyArray &x_k, int n);
     int get_size();
@@ -114,6 +118,7 @@ public:
     int* get_x();
     int* get_y();
     double* get_data();
+    void WriteData();
 
     void set_value(int row, int col, double value);
     int CountNonZero();

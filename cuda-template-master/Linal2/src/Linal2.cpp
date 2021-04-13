@@ -398,10 +398,10 @@ Matrix & Matrix::transpose() {
 	} else {
 		cout << "ERROR! transpose: col != row" << endl;
 	}	
-	return *this;
+    return *this;
 }
 
-Matrix & Matrix::transpose2() {
+void Matrix::transpose2() {
 	Matrix temp_matr(row, col);
 	temp_matr = *this;
 
@@ -420,13 +420,17 @@ Matrix & Matrix::transpose2() {
 	} else {
 		for (int i = 0; i < row; i++) {
 			for (int j = 0; j < col; j++) {
-				m[j + i * col] = temp_matr.m[i + j * row];
+                m[j + i * col] = temp_matr.m[i + j * row];
 				// temp_matr(i, j) = m[i + j * col];
 				//m[j + i * col] = temp_matr.m[i + j * row];
 			}
 		}
 	}	
-	return *this;
+    //return *this;
+}
+
+void Matrix::transpose_not_square() {
+
 }
 
 //not ideal
@@ -478,6 +482,20 @@ void Matrix::Get_matrix(int n, Matrix &temp_matr, int indRow, int indCol) {
 	}
 }
 
+double det3x3(double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8) {
+    Matrix temp(3, 3);
+    temp(0, 0) = a0;
+    temp(0, 1) = a1;
+    temp(0, 2) = a2;
+    temp(1, 0) = a3;
+    temp(1, 1) = a4;
+    temp(1, 2) = a5;
+    temp(2, 0) = a6;
+    temp(2, 1) = a7;
+    temp(2, 2) = a8;
+    return temp.det(3);
+}
+
 double Matrix::det(int n) {
 	double temp = 0;
 	int k = 1;
@@ -492,7 +510,13 @@ double Matrix::det(int n) {
                 m[6]*m[4]*m[2] -
                 m[0]*m[5]*m[7] -
                 m[1]*m[3]*m[8];
-    } else if (n >= 4) {
+    } else if (n == 4) {
+        double v1 = det3x3(m[5], m[6], m[7], m[9], m[10], m[11], m[13], m[14], m[15]);
+        double v2 = det3x3(m[1], m[2], m[3], m[9], m[10], m[11], m[13], m[14], m[15]);
+        double v3 = det3x3(m[1], m[2], m[3], m[5], m[6], m[7], m[13], m[14], m[15]);
+        double v4 = det3x3(m[1], m[2], m[3], m[5], m[6], m[7], m[9], m[10], m[11]);
+        return v1 - v2 + v3 - v4;
+    } else if (n >= 5) {
 		for (int i = 0; i < n; i++) {
 			int p = n - 1;
 			Matrix temp_matr(p, p);
@@ -821,37 +845,44 @@ int SparseMatrix::CountNonZero() {
 void SparseMatrix::ConvertTripletToSparse(std::vector<Triplet> t) {
     int new_size = sparse_size;
     int k = 1;
-        bool changeme = false;
-        for (int i = 0; i < sparse_size; i++ ) {
-            if (i == 0) {
-                x[i] = t[i].x_value;
-                y[i] = t[i].y_value;
-                data[i] = t[i].value;
-                this->v.push_back(t[i]);
-            } else {
-                for (int j = 0; j < i; j++) {
-                    if (t[i].x_value == x[j] && t[i].y_value == y[j]) {
-                        changeme = true;
-                        //t[i].Show();
-                    }
-                }
-                if (changeme == true) {
-                    for (int j = 0; j < i; j++) {
-                        if (t[i].x_value == x[j] && t[i].y_value == y[j]) {
-                            data[j] += t[i].value;
-                            new_size--;
-                            changeme = false;
-                        }
-                    }
-                } else {
-                    x[k] = t[i].x_value;
-                    y[k] = t[i].y_value;
-                    data[k] = t[i].value;
-                    this->v.push_back(t[i]);
-                    k++;
+    int index = 0;
+    bool changeme = false;
+    for (int i = 0; i < sparse_size; i++ ) {
+        //t[i].Show();
+        if (i == 0) {
+            x[0] = t[0].x_value;
+            y[0] = t[0].y_value;
+            data[0] = t[0].value;
+            this->v.push_back(t[0]);
+            //t[0].Show();
+        } else {
+            for (int j = 0; j < k; j++) {
+                if (t[i].x_value == x[j] && t[i].y_value == y[j]) {
+//                  if (t[i].x_value == 0 && t[i].y_value == 1) {
+//                      std::cout << index << " ";
+//                  }
+                    changeme = true;
+                    index = j;
                 }
             }
+            if (changeme == true) {
+                //if (t[i].x_value == x[index] && t[i].y_value == y[index]) {
+//                  if (t[i].x_value == 0 && t[i].y_value == 0) {
+//                      std::cout << index << " ";
+//                  }
+                data[index] += t[i].value;
+                new_size--;
+                changeme = false;
+                    //}
+            } else {
+                x[k] = t[i].x_value;
+                y[k] = t[i].y_value;
+                data[k] = t[i].value;
+                this->v.push_back(t[i]);
+                k++;
+            }
         }
+   }
 
     sparse_size = new_size;
 
@@ -967,6 +998,31 @@ void SparseMatrix::SortIt() {
     }
 }
 
+void SparseMatrix::ConvertToCSR(int *ptr, int *ind, double *data_csr, int n) {
+        for (int i = 0; i < n + 1; i++)
+        {
+            //ptr[i] = 0.0;
+        }
+
+        for (int i = 0; i < sparse_size; i++)
+        {
+            data_csr[i] = data[i];
+            ind[i] = y[i];
+            //ptr[x[i] + 1]++;
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            //ptr[i + 1] += ptr[i];
+        }
+}
+
+void SparseMatrix::WriteData() {
+    for (int i = 0; i < sparse_size; i++) {
+        cout << data[i] << " ";
+    }
+}
+
 void SparseMatrix::SparseLU() {
 //    for (int i = 0; i < n; i++) {
 //        for (int j = i; j < n; j++) {
@@ -987,43 +1043,43 @@ void SparseMatrix::SparseLU() {
 //            }
 //        }
 //    }
-        float value1;
-        int x1, y1;
-    cout << "SparseLU ------\n";
-    SparseMatrix U(*this);
-    SparseMatrix L(sparse_size);
-        for (int i = 0; i < sparse_size; i++) {
-            if (x[i] == y[i]) {
-                value1 = data[i];
-                x1 = x[i];
-                y1 = y[i];
-            }
-            for (int j = i; j < sparse_size; j++) {
-                L.data[j] = U.data[j] / value1;
-            }
-        }
-            for (int k = 1; k < sparse_size; k++) {
-                for (int i = k - 1; i < sparse_size; i++) {
-                    if (x[i] == y[i]) {
-                        value1 = data[i];
-                        x1 = x[i];
-                        y1 = y[i];
-                    }
-                    for (int j = i; j < sparse_size; j++) {
-                        L.data[j] = U.data[j] / value1;
-                    }
-                }
+//        float value1;
+//        int x1, y1;
+//    cout << "SparseLU ------\n";
+//    SparseMatrix U(*this);
+//    SparseMatrix L(sparse_size);
+//        for (int i = 0; i < sparse_size; i++) {
+//            if (x[i] == y[i]) {
+//                value1 = data[i];
+//                x1 = x[i];
+//                y1 = y[i];
+//            }
+//            for (int j = i; j < sparse_size; j++) {
+//                L.data[j] = U.data[j] / value1;
+//            }
+//        }
+//            for (int k = 1; k < sparse_size; k++) {
+//                for (int i = k - 1; i < sparse_size; i++) {
+//                    if (x[i] == y[i]) {
+//                        value1 = data[i];
+//                        x1 = x[i];
+//                        y1 = y[i];
+//                    }
+//                    for (int j = i; j < sparse_size; j++) {
+//                        L.data[j] = U.data[j] / value1;
+//                    }
+//                }
 
 //                for (int i = k; i < sparse_size; i++) {
 //                    for (int j = k - 1; j < sparse_size; j++) {
 //                        U.data[j] = U.data[j] - L.data[k - 1 + i * col] * U.data[j + (k - 1) * col];
 //                    }
 //                }
-            }
-    cout<<"U=\n";
-    U.Show();
-    cout<<"L=\n";
-    L.Show();
+//            }
+//    cout<<"U=\n";
+//    U.Show();
+//    cout<<"L=\n";
+//    L.Show();
 
 
 
