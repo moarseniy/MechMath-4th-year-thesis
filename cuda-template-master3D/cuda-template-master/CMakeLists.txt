@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 2.8)
+
+project(FemProject)
+
+ADD_SUBDIRECTORY(Linal2)
+ADD_SUBDIRECTORY(CudaLib)
+ADD_SUBDIRECTORY(fem)
+ADD_SUBDIRECTORY(VTKfile)
+ADD_SUBDIRECTORY(femfunc)
+#ADD_SUBDIRECTORY(CudaTest)
+
