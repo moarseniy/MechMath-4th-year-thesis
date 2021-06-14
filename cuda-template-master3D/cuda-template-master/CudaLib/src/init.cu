@@ -122,9 +122,36 @@ void inverse(float *ic, float *b, int size) {
    //return ic;
 }
 
+__device__
+void insertGlobalElement (float value, int I, int J, int *K_x, int *K_y, int *rowSizes, float *K_value, int *constraints,  int constraintCount) {
+    int size = rowSizes[I] - 1;
+    int prev_size = (I == 0) ? 0 : (rowSizes[I - 1] - 1);
+    //printf("%d %d ", size - prev_size, I);
+
+    //printf("%d %d  ", K_x[size], I);
+    int it = size - prev_size + 1;
+    if (I == 0) {
+        size = 0;
+    }
+    for (int id = 0; id < it; id++) {
+        if (K_x[prev_size + id] == I && K_y[prev_size + id] == J) {
+            K_value[prev_size + id] += value;
+            for (int t = 0; t < constraintCount; t++) {
+                if (I == constraints[t] || J == constraints[t]) {
+                    if (I == J) {
+                        K_value[prev_size + id] = 1.0;
+                    } else {
+                        K_value[prev_size + id] = 0.0;
+                    }
+                }
+            }
+        }
+    }
+}
+
 __global__
 void CalculateLocalSets(int elementsCount, const float *nodesX, const float *nodesY, const float *nodesZ, int nodesCount,
-                        int *elements, int k, int sumColors, float *D, int *K_x, int *K_y, float *K_value, int *constraints, int constraintCount) {
+                        int *elements, int k, int sumColors, float *D, int *K_x, int *K_y, int *rowSizes, float *K_value, int *constraints, int constraintCount) {
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     //printf("!%d ", index);
     //printf("%d ", elementsCount);
@@ -283,60 +310,138 @@ void CalculateLocalSets(int elementsCount, const float *nodesX, const float *nod
         //printf("%f ", K_value[0]);
 
         //__syncthreads();
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 int idi = 3 * elements[4 * (index + sumColors) + i];
                 int idj = 3 * elements[4 * (index + sumColors) + j];
                 //printf("%d-%d ", idi, idj);
-                K_x[(idj + 0) + (idi + 0) * 3 * nodesCount] = idi + 0;
-                K_y[(idj + 0) + (idi + 0) * 3 * nodesCount] = idj + 0;
-                K_value[(idj + 0) + (idi + 0) * 3 * nodesCount] += K[(3 * j + 0) + (3 * i + 0) * 12];
+                insertGlobalElement(K[(3 * j + 0) + (3 * i + 0) * 12], idi + 0, idj + 0, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 1) + (3 * i + 0) * 12], idi + 0, idj + 1, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 2) + (3 * i + 0) * 12], idi + 0, idj + 2, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
 
-                K_x[(idj + 1) + (idi + 0) * 3 * nodesCount] = idi + 0;
-                K_y[(idj + 1) + (idi + 0) * 3 * nodesCount] = idj + 1;
-                K_value[(idj + 1) + (idi + 0) * 3 * nodesCount] += K[(3 * j + 1) + (3 * i + 0) * 12];
+                insertGlobalElement(K[(3 * j + 0) + (3 * i + 1) * 12], idi + 1, idj + 0, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 1) + (3 * i + 1) * 12], idi + 1, idj + 1, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 2) + (3 * i + 1) * 12], idi + 1, idj + 2, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
 
-                K_x[(idj + 2) + (idi + 0) * 3 * nodesCount] = idi + 0;
-                K_y[(idj + 2) + (idi + 0) * 3 * nodesCount] = idj + 2;
-                K_value[(idj + 2) + (idi + 0) * 3 * nodesCount] += K[(3 * j + 2) + (3 * i + 0) * 12];
+                insertGlobalElement(K[(3 * j + 0) + (3 * i + 2) * 12], idi + 2, idj + 0, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 1) + (3 * i + 2) * 12], idi + 2, idj + 1, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
+                insertGlobalElement(K[(3 * j + 2) + (3 * i + 2) * 12], idi + 2, idj + 2, K_x, K_y, rowSizes, K_value, constraints, constraintCount);
 
-                K_x[(idj + 0) + (idi + 1) * 3 * nodesCount] = idi + 1;
-                K_y[(idj + 0) + (idi + 1) * 3 * nodesCount] = idj + 0;
-                K_value[(idj + 0) + (idi + 1) * 3 * nodesCount] += K[(3 * j + 0) + (3 * i + 1) * 12];
+//                for (int id = 0; id < rowSizes[idi + 0] - rowSizes[idi + 0 - 1]; id++) {
+//                    if (K_x[rowSizes[idi + 0]] == idi + 0 && K_y[rowSizes[idi + 0] + id] == idj + 0) {
+//                        K_value[rowSizes[idi + 0] + id] += K[(3 * j + 0) + (3 * i + 0) * 12];
+//                    }
+//                }
+//                    if (K_x[rowSizes[idi + 0]] == idi + 0 && K_y[rowSizes[idi + 0] + id] == idj + 1) {
+//                        K_value[rowSizes[idi + 0] + id] += K[(3 * j + 1) + (3 * i + 0) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 0]] == idi + 0 && K_y[rowSizes[idi + 0] + id] == idj + 2) {
+//                        K_value[rowSizes[idi + 0] + id] += K[(3 * j + 2) + (3 * i + 0) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 1]] == idi + 1 && K_y[rowSizes[idi + 1] + id] == idj + 0) {
+//                        K_value[rowSizes[idi + 1] + id] += K[(3 * j + 0) + (3 * i + 1) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 1]] == idi + 1 && K_y[rowSizes[idi + 1] + id] == idj + 1) {
+//                        K_value[rowSizes[idi + 1] + id] += K[(3 * j + 1) + (3 * i + 1) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 1]] == idi + 1 && K_y[rowSizes[idi + 1] + id] == idj + 2) {
+//                        K_value[rowSizes[idi + 1] + id] += K[(3 * j + 2) + (3 * i + 1) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 2]] == idi + 2 && K_y[rowSizes[idi + 2] + id] == idj + 0) {
+//                        K_value[rowSizes[idi + 2] + id] += K[(3 * j + 0) + (3 * i + 2) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 2]] == idi + 2 && K_y[rowSizes[idi + 2] + id] == idj + 1) {
+//                        K_value[rowSizes[idi + 2] + id] += K[(3 * j + 1) + (3 * i + 2) * 12];
+//                    }
+//                    if (K_x[rowSizes[idi + 2]] == idi + 2 && K_y[rowSizes[idi + 2] + id] == idj + 2) {
+//                        K_value[rowSizes[idi + 2] + id] += K[(3 * j + 2) + (3 * i + 2) * 12];
+//                    }
 
-                K_x[(idj + 1) + (idi + 1) * 3 * nodesCount] = idi + 1;
-                K_y[(idj + 1) + (idi + 1) * 3 * nodesCount] = idj + 1;
-                K_value[(idj + 1) + (idi + 1) * 3 * nodesCount] += K[(3 * j + 1) + (3 * i + 1) * 12];
+//                                for (int t = 0; t < constraintCount; t++) {
+//                                    for (int i1 = 0; i1 < 3; i1++) {
+//                                        for (int j1 = 0; j1 < 3; j1++) {
+//                                            if (idi + i1 == constraints[t] || idj + j1 == constraints[t]) {
+//                                                if (idi + i1 == idj + j1) {
+//                                                    for (int id = 0; id < 3 * nodesCount; id++) {
+//                                                        if (K_x[rowSizes[idi + i1]] == idi + i1 && K_y[rowSizes[idi + i1] + id] == idj + j1) {
+//                                                            K_value[rowSizes[idi + i1] + id] = 1.0;
+//                                                        }
+//                                                    }
+//                                                } else {
+//                                                    for (int id = 0; id < 3 * nodesCount; id++) {
+//                                                        if (K_x[rowSizes[idi + i1]] == idi + i1 && K_y[rowSizes[idi + i1] + id] == idj + j1) {
+//                                                            K_value[rowSizes[idi + i1] + id] = 0.0;
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
 
-                K_x[(idj + 2) + (idi + 1) * 3 * nodesCount] = idi + 1;
-                K_y[(idj + 2) + (idi + 1) * 3 * nodesCount] = idj + 2;
-                K_value[(idj + 2) + (idi + 1) * 3 * nodesCount] += K[(3 * j + 2) + (3 * i + 1) * 12];
+//                int id = 0;
+//                bool a0 = false, a1 = false, a2 = false, a3 = false, a4 = false, a5 = false, a6 = false, a7 = false , a8 = false;
+//                while (!a0 || !a1 || !a2 || !a3 || !a4 || !a5 || !a6 || !a7 || !a8) {
+//                    if (K_x[id + rowSizes[idi + 0]] == idi + 0 && K_y[id + rowSizes[idi + 0]] == idj + 0) {
+//                        K_value[id + rowSizes[idi + 0]] += K[(3 * j + 0) + (3 * i + 0) * 12]; a0 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 0]] == idi + 0 && K_y[id + rowSizes[idi + 0]] == idj + 1) {
+//                        K_value[id + rowSizes[idi + 0]] += K[(3 * j + 1) + (3 * i + 0) * 12]; a1 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 0]] == idi + 0 && K_y[id + rowSizes[idi + 0]] == idj + 2) {
+//                        K_value[id + rowSizes[idi + 0]] += K[(3 * j + 2) + (3 * i + 0) * 12]; a2 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 1]] == idi + 1 && K_y[id + rowSizes[idi + 1]] == idj + 0) {
+//                        K_value[id + rowSizes[idi + 1]] += K[(3 * j + 0) + (3 * i + 1) * 12]; a3 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 1]] == idi + 1 && K_y[id + rowSizes[idi + 1]] == idj + 1) {
+//                        K_value[id + rowSizes[idi + 1]] += K[(3 * j + 1) + (3 * i + 1) * 12]; a4 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 1]] == idi + 1 && K_y[id + rowSizes[idi + 1]] == idj + 2) {
+//                        K_value[id + rowSizes[idi + 1]] += K[(3 * j + 2) + (3 * i + 1) * 12]; a5 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 2]] == idi + 2 && K_y[id + rowSizes[idi + 2]] == idj + 0) {
+//                        K_value[id + rowSizes[idi + 2]] += K[(3 * j + 0) + (3 * i + 2) * 12]; a6 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 2]] == idi + 2 && K_y[id + rowSizes[idi + 2]] == idj + 1) {
+//                        K_value[id + rowSizes[idi + 2]] += K[(3 * j + 1) + (3 * i + 2) * 12]; a7 = true;
+//                    }
+//                    if (K_x[id + rowSizes[idi + 2]] == idi + 2 && K_y[id + rowSizes[idi + 2]] == idj + 2) {
+//                        K_value[id + rowSizes[idi + 2]] += K[(3 * j + 2) + (3 * i + 2) * 12]; a8 = true;
+//                    }
 
-                K_x[(idj + 0) + (idi + 2) * 3 * nodesCount] = idi + 2;
-                K_y[(idj + 0) + (idi + 2) * 3 * nodesCount] = idj + 0;
-                K_value[(idj + 0) + (idi + 2) * 3 * nodesCount] += K[(3 * j + 0) + (3 * i + 2) * 12];
+//                    id++;
+//                }
 
-                K_x[(idj + 1) + (idi + 2) * 3 * nodesCount] = idi + 2;
-                K_y[(idj + 1) + (idi + 2) * 3 * nodesCount] = idj + 1;
-                K_value[(idj + 1) + (idi + 2) * 3 * nodesCount] += K[(3 * j + 1) + (3 * i + 2) * 12];
+//                for (int t = 0; t < constraintCount; t++) {
+//                    for (int i1 = 0; i1 < 3; i1++) {
+//                        for (int j1 = 0; j1 < 3; j1++) {
+//                            if (idi + i1 == constraints[t] || idj + j1 == constraints[t]) {
+//                                id = 0;
+//                                bool stopme = false;
+//                                if (idi + i1 == idj + j1) {
+//                                    while (!stopme) {
+//                                        if (K_x[id] == idi + i1 && K_y[id] == idj + j1) {
+//                                            K_value[id] = 1.0;
+//                                            stopme = true;
+//                                        }
+//                                        id++;
+//                                    }
+//                                } else {
+//                                    while (!stopme) {
+//                                        if (K_x[id] == idi + i1 && K_y[id] == idj + j1) {
+//                                            K_value[id] = 0.0;
+//                                            stopme = true;
+//                                        }
+//                                        id++;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
-                K_x[(idj + 2) + (idi + 2) * 3 * nodesCount] = idi + 2;
-                K_y[(idj + 2) + (idi + 2) * 3 * nodesCount] = idj + 2;
-                K_value[(idj + 2) + (idi + 2) * 3 * nodesCount] += K[(3 * j + 2) + (3 * i + 2) * 12];
-
-                for (int t = 0; t < constraintCount; t++) {
-                    for (int i1 = 0; i1 < 3; i1++) {
-                        for (int j1 = 0; j1 < 3; j1++) {
-                            if (idi + i1 == constraints[t] || idj + j1 == constraints[t]) {
-                                if (idi + i1 == idj + j1) {
-                                    K_value[(idj + j1) + (idi + i1) * 3 * nodesCount] = 1.0;
-                                } else {
-                                    K_value[(idj + j1) + (idi + i1) * 3 * nodesCount] = 0.0;
-                                }
-                            }
-                        }
-                    }
-                }
 //                K_x[(idj + 0) + (idi + 0) * 3 * nodesCount] = idi + 0;
 //                K_y[(idj + 0) + (idi + 0) * 3 * nodesCount] = idj + 0;
 //                K_value[(idj + 0) + (idi + 0) * 3 * nodesCount] += K[(3 * j + 0) + (3 * i + 0) * 12];
@@ -372,6 +477,20 @@ void CalculateLocalSets(int elementsCount, const float *nodesX, const float *nod
 //                K_x[(idj + 2) + (idi + 2) * 3 * nodesCount] = idi + 2;
 //                K_y[(idj + 2) + (idi + 2) * 3 * nodesCount] = idj + 2;
 //                K_value[(idj + 2) + (idi + 2) * 3 * nodesCount] += K[(3 * j + 2) + (3 * i + 2) * 12];
+
+//                for (int t = 0; t < constraintCount; t++) {
+//                    for (int i1 = 0; i1 < 3; i1++) {
+//                        for (int j1 = 0; j1 < 3; j1++) {
+//                            if (idi + i1 == constraints[t] || idj + j1 == constraints[t]) {
+//                                if (idi + i1 == idj + j1) {
+//                                    K_value[(idj + j1) + (idi + i1) * 3 * nodesCount] = 1.0;
+//                                } else {
+//                                    K_value[(idj + j1) + (idi + i1) * 3 * nodesCount] = 0.0;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
             }
             //__syncthreads();
@@ -530,16 +649,16 @@ void FiniteElementMethodCUDA(float *h_D, int *h_elements,
 
     ///////
 
-    int sumColors = 0;
-    cout << "\ncolorsCount = " << colorsCount << endl;
-    for (int k = 0; k < colorsCount; k++) {
-        CalculateLocalSets<<<(255+h_colors[k])/256, 256>>> (h_colors[k], d_nodesX, d_nodesY, d_nodesZ, nodesCount,
-                                                  d_elements, k, sumColors, d_D, d_K_x, d_K_y, d_K_value, d_constraints, constraintsCount);
-        sumColors += h_colors[k];
-        //cout << endl << "!!!" << k << " " << h_colors[k] << endl;
-        //break;
-        cudaDeviceSynchronize();
-    }
+//    int sumColors = 0;
+//    cout << "\ncolorsCount = " << colorsCount << endl;
+//    for (int k = 0; k < colorsCount; k++) {
+//        CalculateLocalSets<<<(255+h_colors[k])/256, 256>>> (h_colors[k], d_nodesX, d_nodesY, d_nodesZ, nodesCount,
+//                                                  d_elements, k, sumColors, d_D, d_K_x, d_K_y, d_K_value, d_constraints, constraintsCount);
+//        sumColors += h_colors[k];
+//        //cout << endl << "!!!" << k << " " << h_colors[k] << endl;
+//        //break;
+//        cudaDeviceSynchronize();
+//    }
 
 
     cudaEventRecord(stop, 0);
@@ -603,9 +722,6 @@ void FiniteElementMethodCUDA(float *h_D, int *h_elements,
 
 
 
-
-
-
     cudaFree(d_D);
     cudaFree(d_K_value);
     cudaFree(d_K_x);
@@ -626,8 +742,6 @@ void FiniteElementMethodCUDA(float *h_D, int *h_elements,
 //    for (int i = 0; i < h_nnz[0]; i++) {
 //        cout << h_data[i] << " ";
 //    }
-
-
 
 
     cusolverSpHandle_t handle;
@@ -656,12 +770,12 @@ void FiniteElementMethodCUDA(float *h_D, int *h_elements,
     cudaEventElapsedTime(&gpuTime, start, stop);
     printf("GPU(SOLVER) = %.4f ms\n", gpuTime);
 
-    float *h_x = new float[3 * nodesCount];
-    cudaMemcpy(h_x, d_x, 3 * nodesCount * sizeof(float), cudaMemcpyDeviceToHost);
+//    float *h_x = new float[3 * nodesCount];
+//    cudaMemcpy(h_x, d_x, 3 * nodesCount * sizeof(float), cudaMemcpyDeviceToHost);
 
-    for (int i = 0; i < 3 * nodesCount; i++) {
-        cout << h_x[i] << " ";
-    }
+//    for (int i = 0; i < 3 * nodesCount; i++) {
+//        cout << h_x[i] << " ";
+//    }
 
 
     cudaFree(d_b);
@@ -674,7 +788,207 @@ void FiniteElementMethodCUDA(float *h_D, int *h_elements,
 
 }
 
+void FiniteElementMethodCUDA2(int *h_x_s, int *h_y_s, int *h_rowSizes, float *h_D, int *h_elements,
+                              int *h_elements0, int *h_elements1, int *h_elements2, int *h_elements3, int elementsCount,
+                              float *h_nodesX, float *h_nodesY, float *h_nodesZ, int nodesCount,
+                              int *h_colors, int colorsCount, int *h_constraints, int constraintsCount, float *h_b, int nnz_size, float *h_x) {
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float gpuTime = 0.0;
+    cudaEventRecord(start, 0);
 
+    int *d_elements, *d_elements0, *d_elements1, *d_elements2, *d_elements3, *d_colors, *d_K_x, *d_K_y, *d_rowSizes, *d_constraints;
+    float *d_D, *d_nodesX, *d_nodesY, *d_nodesZ,  *d_K_value, *d_b, *d_x;
+
+    int SIZE = nnz_size;
+
+    int *d_nnz;
+    int *h_nnz = new int[1];
+    cudaMalloc((void**)&d_nnz, 1 * sizeof(int));
+
+
+    cudaMalloc((void**)&d_b, 3 * nodesCount * sizeof(float));
+    cudaMemcpy(d_b, h_b, 3 * nodesCount * sizeof(float), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_x, 3 * nodesCount * sizeof(float));
+
+    //cout << "elementsCount = " << elementsCount << endl;
+    cudaMalloc((void**)&d_elements, 4 * elementsCount * sizeof(int));
+    cudaMemcpy(d_elements, h_elements, 4 * elementsCount * sizeof(int), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_D, 6 * 6 * sizeof(float));
+    cudaMemcpy(d_D, h_D, 6 * 6 * sizeof(float), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_K_x, SIZE * sizeof(int));
+    cudaMalloc((void**)&d_K_y, SIZE * sizeof(int));
+    cudaMalloc((void**)&d_rowSizes, 3 * nodesCount * sizeof(int));
+    cudaMalloc((void**)&d_K_value, SIZE * sizeof(float));
+    cudaMemcpy(d_K_x, h_x_s, SIZE * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_K_y, h_y_s, SIZE * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_rowSizes, h_rowSizes, 3 * nodesCount * sizeof(int), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_nodesX, nodesCount * sizeof(float));
+    cudaMalloc((void**)&d_nodesY, nodesCount * sizeof(float));
+    cudaMalloc((void**)&d_nodesZ, nodesCount * sizeof(float));
+    cudaMemcpy(d_nodesX, h_nodesX, nodesCount * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_nodesY, h_nodesY, nodesCount * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_nodesZ, h_nodesZ, nodesCount * sizeof(float), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_colors, colorsCount * sizeof(int));
+    cudaMemcpy(d_colors, h_colors, colorsCount * sizeof(int), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&d_constraints, constraintsCount * sizeof(int));
+    cudaMemcpy(d_constraints, h_constraints, constraintsCount * sizeof(int), cudaMemcpyHostToDevice);
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&gpuTime, start, stop);
+    printf("GPU(Read data) = %.4f ms\n", gpuTime);
+
+
+    int sumColors = 0;
+    cout << "\ncolorsCount = " << colorsCount << endl;
+    for (int k = 0; k < colorsCount; k++) {
+        CalculateLocalSets<<<(255+h_colors[k])/256, 256>>> (h_colors[k], d_nodesX, d_nodesY, d_nodesZ, nodesCount,
+                                                  d_elements, k, sumColors, d_D, d_K_x, d_K_y, d_rowSizes, d_K_value,
+                                                  d_constraints, constraintsCount);
+        sumColors += h_colors[k];
+        //cout << endl << "!!!" << k << " " << h_colors[k] << endl;
+        //break;
+        cudaDeviceSynchronize();
+    }
+
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&gpuTime, start, stop);
+    printf("GPU(ColorStiffnessMatrix) = %.4f ms\n", gpuTime);
+
+//    int *h_K_x = new int[SIZE];
+//    int *h_K_y = new int[SIZE];
+//    float *h_K_value = new float[SIZE];
+
+//    cudaMemcpy(h_K_x, d_K_x, SIZE * sizeof(int), cudaMemcpyDeviceToHost);
+//    cudaMemcpy(h_K_y, d_K_y, SIZE * sizeof(int), cudaMemcpyDeviceToHost);
+//    cudaMemcpy(h_K_value, d_K_value, SIZE * sizeof(float), cudaMemcpyDeviceToHost);
+
+//    for (int i = 0; i < SIZE; i++) {
+//        //if (h_K_value[i] != 0.0) {
+//            cout << h_K_x[i] << " " << h_K_y[i] << " " << h_K_value[i] << endl;
+//        //}
+//    }
+
+    cudaFree(d_nodesX);
+    cudaFree(d_nodesY);
+    cudaFree(d_nodesZ);
+
+
+    CountNonZeroValues<<<1, 1>>> (d_K_x, d_K_y, d_K_value, SIZE, d_nnz);
+    cudaMemcpy(h_nnz, d_nnz, 1 * sizeof(int), cudaMemcpyDeviceToHost);
+    cout << "\nNONZERO=" << h_nnz[0] << endl;
+
+
+//    for (int i = 0; i < SIZE; i++) {
+//        ApplyConstraintsCuda<<<(255+constraintsCount)/256, 256>>> (d_K_x, d_K_y, d_K_value, d_constraints, constraintsCount, i);
+//    }
+
+//    cudaEventRecord(stop, 0);
+//    cudaEventSynchronize(stop);
+//    cudaEventElapsedTime(&gpuTime, start, stop);
+//    printf("GPU(ApplyConstraints) = %.4f ms\n", gpuTime);
+
+
+//    CountNonZeroValues<<<1, 1>>> (d_K_x, d_K_y, d_K_value, SIZE, d_nnz);
+//    cudaMemcpy(h_nnz, d_nnz, 1 * sizeof(int), cudaMemcpyDeviceToHost);
+//    cout << "NONZERO(After Constraints)=" << h_nnz[0] << endl;
+
+
+    int *d_ptr, *d_ind, *d_row;
+    float *d_data;
+
+    int *h_ptr = new int[3 * nodesCount + 1];
+    float *h_data = new float[h_nnz[0]];
+    int *h_ind = new int[h_nnz[0]];
+
+    cudaMalloc((void**)&d_ptr, (3 * nodesCount + 1) * sizeof(int));
+    //cudaMalloc((void**)&d_row, h_nnz[0] * sizeof(int));
+    cudaMalloc((void**)&d_ind, h_nnz[0] * sizeof(int));
+    cudaMalloc((void**)&d_data, h_nnz[0] * sizeof(float));
+
+    ConvertToCSR<<<1, 1>>> (d_K_x, d_K_y, d_K_value, d_ptr, d_ind, d_data, SIZE, nodesCount);
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&gpuTime, start, stop);
+    printf("GPU(ConvertToCSR) = %.4f ms\n", gpuTime);
+
+
+
+    cudaFree(d_D);
+    cudaFree(d_K_value);
+    cudaFree(d_K_x);
+    cudaFree(d_K_y);
+    cudaFree(d_colors);
+    cudaFree(d_constraints);
+    cudaFree(d_elements);
+
+//    cudaMemcpy(h_ptr, d_ptr, (3 * nodesCount + 1) * sizeof(int), cudaMemcpyDeviceToHost);
+//    for (int i = 0; i < 3 * nodesCount + 1; i++) {
+//        cout << h_ptr[i] << " ";
+//    }
+//    cudaMemcpy(h_ind, d_ind, h_nnz[0] * sizeof(int), cudaMemcpyDeviceToHost);
+//    for (int i = 0; i < h_nnz[0]; i++) {
+//        cout << h_ind[i] << " ";
+//    }
+//    cudaMemcpy(h_data, d_data, h_nnz[0] * sizeof(float), cudaMemcpyDeviceToHost);
+//    for (int i = 0; i < h_nnz[0]; i++) {
+//        cout << h_data[i] << " ";
+//    }
+
+
+    cusolverSpHandle_t handle;
+    cusolverSpCreate(&handle);
+    cusparseMatDescr_t descr;
+    cusparseCreateMatDescr(&descr);
+
+//    cudaMemcpy(d_csrValA, h_csrValA, nnz * sizeof(float), cudaMemcpyHostToDevice);
+//    cudaMemcpy(d_csrRowPtrA, h_csrRowPtrA, (n + 1) * sizeof(int), cudaMemcpyHostToDevice);
+//    cudaMemcpy(d_csrColIndA, h_csrColIndA, nnz * sizeof(int), cudaMemcpyHostToDevice);
+//    cudaMemcpy(d_b, h_b, n * sizeof(float), cudaMemcpyHostToDevice);
+
+
+
+    cout<<"start solving...\n";
+    float tol = 1e-16;
+    int reorder = 1;
+    int singularity = 0;
+    cusolverSpScsrlsvqr(handle, 3 * nodesCount, h_nnz[0], descr, d_data, d_ptr, d_ind, d_b, tol,
+                     reorder, d_x, &singularity);
+
+    cout << "end solving...\n";
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&gpuTime, start, stop);
+    printf("GPU(SOLVER) = %.4f ms\n", gpuTime);
+
+
+    cudaMemcpy(h_x, d_x, 3 * nodesCount * sizeof(float), cudaMemcpyDeviceToHost);
+
+//    for (int i = 0; i < 3 * nodesCount; i++) {
+//        cout << h_x[i] << " ";
+//    }
+
+
+    cudaFree(d_b);
+    cudaFree(d_x);
+    cudaFree(d_data);
+    cudaFree(d_ptr);
+    cudaFree(d_ind);
+    cudaFree(d_nnz);
+    delete [] h_nnz;
+}
 
 void CudaSolve(int *h_csrRowPtrA, int *h_csrColIndA, float *h_csrValA, int n, int nnz, float *h_b, float *h_x) {
 
@@ -1001,7 +1315,274 @@ void LU_GPU_SOLVE(int *h_A_RowIndices, int *h_A_ColIndices, float *h_A, int n, i
     }
 }
 
+///////////////////////////////////////////////////
 
+#define BLOCK_DIM_VEC 32
+
+#define NB_ELEM_MAT 32
+#define BLOCK_SIZE_MAT 32
+
+#define EPS 1e-14
+#define MAX_ITER 1000
+
+__global__ void matVec(float* A, float* b, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        float tmp = 0;
+        for (int i = 0; i < SIZE; i++) {
+            tmp += b[i] * A[SIZE * index_x + i];
+        }
+        out[index_x] = tmp;
+    }
+}
+
+
+__global__ void matVec2(float* A, float* b, float* out, int SIZE) {
+    __shared__ float b_shared[NB_ELEM_MAT];
+
+    int effective_block_width;
+    if ((blockIdx.x + 1) * NB_ELEM_MAT <= SIZE) {
+        effective_block_width = NB_ELEM_MAT;
+    }
+    else {
+        // needed to avoid overflow in next row
+        effective_block_width = SIZE % NB_ELEM_MAT;
+    }
+
+    if (threadIdx.x < effective_block_width)
+        b_shared[threadIdx.x] = b[blockIdx.x * NB_ELEM_MAT + threadIdx.x];
+
+    __syncthreads();
+
+    int idy = blockIdx.y * BLOCK_SIZE_MAT + threadIdx.x;
+    float tmp_scal = 0.0;
+    // threads outside matrix dimension are not needed (vertical)
+    if (idy < SIZE) {
+        for (int i = 0; i < effective_block_width; i++) {
+            // take advantage of symmetric matrix for coalesced memory access
+            tmp_scal += b_shared[i] * A[(blockIdx.x * NB_ELEM_MAT + i) * SIZE + idy];//!!!A(blockIdx.x * NB_ELEM_MAT + i, idy);
+        }
+        atomicAdd(out + idy, tmp_scal);
+    }
+}
+
+
+__global__ void vecPlusVec(float* a, float* b, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        out[index_x] = b[index_x] + a[index_x];
+    }
+}
+
+
+__global__ void vecPlusVec2(float* a, float* b, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        out[index_x] = b[index_x] + a[index_x];
+        b[index_x] = 0.0;
+    }
+}
+
+
+__global__ void vecMinVec(float* a, float* b, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        out[index_x] = a[index_x] - b[index_x];
+    }
+}
+
+
+__global__ void vecVec(float* a, float* b, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    float tmp = 0.0;
+    if (index_x == 0) {
+        for (int i = 0; i < SIZE; i++) {
+            tmp += b[i] * a[i];
+        }
+        *out = tmp;
+    }
+}
+
+
+__global__ void vecVec2(float* a, float* b, float* out, int SIZE) {
+    // each block has it's own shared_tmp of size BLOCK_DIM_VEC
+    __shared__ float shared_tmp[BLOCK_DIM_VEC];
+
+    // needed for atomicAdd
+    if (threadIdx.x + blockDim.x * blockIdx.x == 0) {
+        *out = 0.0;
+    }
+
+
+    if (blockIdx.x * blockDim.x + threadIdx.x < SIZE) {
+        shared_tmp[threadIdx.x] = a[blockIdx.x * blockDim.x + threadIdx.x]
+                * b[blockIdx.x * blockDim.x + threadIdx.x];
+    } else {
+        // needed for the reduction
+        shared_tmp[threadIdx.x] = 0.0;
+    }
+
+    // reduction within block
+    for (int i = blockDim.x / 2; i >= 1; i = i / 2) {
+        // threads access memory position written by other threads so sync is needed
+        __syncthreads();
+        if (threadIdx.x < i) {
+            shared_tmp[threadIdx.x] += shared_tmp[threadIdx.x + i];
+        }
+    }
+
+    // atomic add the partial reduction in out
+    if (threadIdx.x == 0) {
+        atomicAdd(out, shared_tmp[0]);
+    }
+}
+
+
+__global__ void scalarVec(float* scalar, float* a, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        out[index_x] = a[index_x] * *scalar;
+    }
+}
+
+
+__global__ void memCopy(float* in, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x < SIZE) {
+        out[index_x] = in[index_x];
+    }
+}
+
+
+__global__ void divide(float* num, float* den, float* out, int SIZE) {
+    unsigned int index_x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index_x == 0) {
+        *out = *num / *den;
+    }
+}
+
+
+void solveCG_cuda(float* A, float* b, float* x, float* p, float* r, float* temp,
+        float* alpha, float* beta, float* r_norm, float* r_norm_old,
+        float* temp_scal, float* h_x, float* h_r_norm, int SIZE) {
+
+    dim3 vec_block_dim(BLOCK_DIM_VEC);
+    dim3 vec_grid_dim((SIZE + BLOCK_DIM_VEC - 1) / BLOCK_DIM_VEC);
+
+    dim3 mat_grid_dim((SIZE + NB_ELEM_MAT - 1) / NB_ELEM_MAT, (SIZE + BLOCK_SIZE_MAT - 1) / BLOCK_SIZE_MAT);
+    dim3 mat_block_dim(BLOCK_SIZE_MAT);
+
+    vecVec2<<<vec_grid_dim, vec_block_dim>>>(r, r, r_norm_old, SIZE);
+    int k = 0;
+    //long micro_begin_gpu = getMicrotime();
+    while ((k < MAX_ITER) && (*h_r_norm > EPS)) {
+        // temp = A * p (only compute matrix vector product once)
+        matVec2<<<mat_grid_dim, mat_block_dim>>>(A, p, temp, SIZE);
+
+        // alpha_k = ...
+        vecVec2<<<vec_grid_dim, vec_block_dim>>>(p, temp, temp_scal, SIZE);
+        divide<<<1, 1>>>(r_norm_old, temp_scal, alpha, SIZE);
+
+        // r_{k+1} = ...
+        scalarVec<<<vec_grid_dim, vec_block_dim>>>(alpha, temp, temp, SIZE);
+        vecMinVec<<<vec_grid_dim, vec_block_dim>>>(r, temp, r, SIZE);
+
+        // x_{k+1} = ...
+        scalarVec<<<vec_grid_dim, vec_block_dim>>>(alpha, p, temp, SIZE);
+        vecPlusVec<<<vec_grid_dim, vec_block_dim>>>(x, temp, x, SIZE);
+
+        // beta_k = ...
+        vecVec2<<<vec_grid_dim, vec_block_dim>>>(r, r, r_norm, SIZE);
+        divide<<<1, 1>>>(r_norm, r_norm_old, beta, SIZE);
+
+        // p_{k+1} = ...
+        scalarVec<<<vec_grid_dim, vec_block_dim>>>(beta, p, temp, SIZE);
+        vecPlusVec2<<<vec_grid_dim, vec_block_dim>>>(r, temp, p, SIZE);
+
+        // set r_norm_old to r_norm
+        memCopy<<<1, 1>>>(r_norm, r_norm_old, SIZE);
+
+        // copy to r_norm to CPU (to evaluate stop condition)
+        cudaMemcpy(h_r_norm, r_norm, sizeof(float), cudaMemcpyDeviceToHost);
+        k++;
+
+    }
+    //long micro_end_gpu = getMicrotime();
+    //printf("Time spent gpu per iter [s]: %e\n", (float) ((micro_end_gpu - micro_begin_gpu)/k) / 1e6);
+}
+
+void callCGM_GPU_NEW(float *h_A, float *h_b, int SIZE) {
+    float* h_x = (float *) calloc(SIZE, sizeof(float));
+    float* h_r_norm = (float *) malloc(sizeof(float));
+    *h_r_norm = 1.0;
+
+    // allocate device memory
+    float* d_A;
+    float* d_b;
+    float* d_x;
+    float* d_p;
+    float* d_r;
+    float* d_temp;
+    cudaMalloc((void **) &d_A, SIZE * SIZE * sizeof(float));
+    cudaMalloc((void **) &d_b, SIZE * sizeof(float));
+    cudaMalloc((void **) &d_x, SIZE * sizeof(float));
+    cudaMalloc((void **) &d_p, SIZE * sizeof(float));
+    cudaMalloc((void **) &d_r, SIZE * sizeof(float));
+    cudaMalloc((void **) &d_temp, SIZE * sizeof(float));
+
+    // copy host memory to device
+    cudaMemcpy(d_A, h_A, SIZE * SIZE * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, h_b, SIZE * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_x, h_x, SIZE * sizeof(float), cudaMemcpyHostToDevice);
+    // assume x0 = 0
+    cudaMemcpy(d_p, h_b, SIZE * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_r, h_b, SIZE * sizeof(float), cudaMemcpyHostToDevice);
+
+    // 4 floats needed
+    float* d_beta;
+    float* d_alpha;
+    float* d_r_norm;
+    float* d_r_norm_old;
+    float* d_temp_scal;
+    cudaMalloc((void **) &d_beta, sizeof(float));
+    cudaMalloc((void **) &d_alpha, sizeof(float));
+    cudaMalloc((void **) &d_r_norm, sizeof(float));
+    cudaMalloc((void **) &d_r_norm_old, sizeof(float));
+    cudaMalloc((void **) &d_temp_scal, sizeof(float));
+
+    // run the main function
+    solveCG_cuda(d_A, d_b, d_x, d_p, d_r, d_temp, d_alpha, d_beta, d_r_norm,
+            d_r_norm_old, d_temp_scal, h_x, h_r_norm, SIZE);
+
+    // allocate memory for the result on host side
+    cudaDeviceSynchronize();
+    // copy result from device to host
+    cudaMemcpy(h_x, d_x, sizeof(float) * SIZE, cudaMemcpyDeviceToHost);
+
+    // compare output with sequential version
+    float* h_x_seq = (float *) calloc(SIZE, sizeof(float));
+    //solveCG_seq(h_A, h_b, h_x_seq);
+
+    //assert(moreOrLessEqual(h_x, h_x_seq) == 1);
+    //printf("\nAssertion passed!\n");
+
+
+    free(h_x);
+    free(h_r_norm);
+
+
+    cudaFree(d_A);
+    cudaFree(d_b);
+    cudaFree(d_x);
+    cudaFree(d_p);
+    cudaFree(d_r);
+    cudaFree(d_temp);
+    cudaFree(d_alpha);
+    cudaFree(d_beta);
+    cudaFree(d_r_norm);
+    cudaFree(d_r_norm_old);
+    cudaFree(d_temp_scal);
+}
 
 
 ///////////////////////////////////////////////////////

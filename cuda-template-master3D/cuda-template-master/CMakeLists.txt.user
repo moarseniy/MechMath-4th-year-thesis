@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.1, 2021-05-16T01:08:05. -->
+<!-- Written by QtCreator 4.14.0, 2021-05-27T16:12:13. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{720a5192-8404-43ea-96b3-272d1c2b9896}</value>
+  <value type="QByteArray">{2bef8b08-0ab5-42d1-8447-3da5989ab7f9}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -76,7 +76,7 @@
     <value type="bool" key="ClangTools.AnalyzeOpenFiles">true</value>
     <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>
     <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.DefaultTidyAndClazy</value>
-    <value type="int" key="ClangTools.ParallelJobs">4</value>
+    <value type="int" key="ClangTools.ParallelJobs">12</value>
     <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
     <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
     <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
@@ -90,7 +90,7 @@
    <value type="QString" key="DeviceType">Desktop</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop (x86-windows-msvc2019-pe-64bit)</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop (x86-windows-msvc2019-pe-64bit)</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{b57ee598-39db-4637-b81c-c607ef46d646}</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{c6a5d6ca-6fe9-4e94-bb0f-68436db2cd8d}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">1</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
@@ -101,19 +101,19 @@
 -DCMAKE_PREFIX_PATH:STRING=%{Qt:QT_INSTALL_PREFIX}
 -DCMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
 -DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">D:\cuda-template-master\cuda-template-master\..\build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\mokin\Desktop\cuda-template-master3D\cuda-template-master\..\build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <valuelist type="QVariantList" key="CMakeProjectManager.MakeStep.BuildTargets">
        <value type="QString">all</value>
       </valuelist>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.MakeStep</value>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Сборка</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
     </valuemap>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
@@ -122,19 +122,19 @@
        <value type="QString">clean</value>
       </valuelist>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.MakeStep</value>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Очистка</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Очистка</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
     </valuemap>
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Отладка</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Debug</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeBuildConfiguration</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
@@ -144,19 +144,19 @@
 -DCMAKE_PREFIX_PATH:STRING=%{Qt:QT_INSTALL_PREFIX}
 -DCMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
 -DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">D:\cuda-template-master\cuda-template-master\..\build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\mokin\Desktop\cuda-template-master3D\cuda-template-master\..\build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <valuelist type="QVariantList" key="CMakeProjectManager.MakeStep.BuildTargets">
        <value type="QString">all</value>
       </valuelist>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.MakeStep</value>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Сборка</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Build</value>
     </valuemap>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.1">
@@ -165,27 +165,27 @@
        <value type="QString">clean</value>
       </valuelist>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Сборка</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Build</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.MakeStep</value>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Очистка</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Очистка</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Clean</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clean</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Clean</value>
     </valuemap>
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Выпуск</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Release</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeBuildConfiguration</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.BuildConfigurationCount">2</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.DeployConfiguration.0">
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">0</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Развёртывание</value>
-     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Развёртывание</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy</value>
+     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Deploy</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.BuildSteps.Deploy</value>
     </valuemap>
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">1</value>
@@ -263,7 +263,7 @@
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">D:/cuda-template-master/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/fem</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/fem</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

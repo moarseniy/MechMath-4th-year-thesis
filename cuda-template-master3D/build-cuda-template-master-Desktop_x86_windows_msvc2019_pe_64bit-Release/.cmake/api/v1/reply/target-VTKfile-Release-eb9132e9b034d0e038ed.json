@@ -1,0 +1,134 @@
+{
+	"archive" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/machine:x64",
+				"role" : "flags"
+			}
+		]
+	},
+	"artifacts" : 
+	[
+		{
+			"path" : "VTKfile/VTKfile.lib"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"VTKfile/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 4,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 10,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/mokin/Desktop/cuda-template-master3D/cuda-template-master/VTKfile/src"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "C:/Users/mokin/Desktop/cuda-template-master3D/cuda-template-master/Linal2/src"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "C:/Users/mokin/Desktop/cuda-template-master3D/cuda-template-master/CudaLib/include"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "Linal2::@67e2bff03f121bc69b54"
+		}
+	],
+	"id" : "VTKfile::@48f3ef6dd308c5d99ec5",
+	"name" : "VTKfile",
+	"nameOnDisk" : "VTKfile.lib",
+	"paths" : 
+	{
+		"build" : "VTKfile",
+		"source" : "VTKfile"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "VTKfile/src/VTKfile.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "VTKfile/src/VTKfile.cpp",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

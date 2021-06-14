@@ -1,0 +1,170 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "Linal2",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "Linal2",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "CudaLib",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "CudaLib",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "fem",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "fem",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "VTKfile",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "VTKfile",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "femfunc",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "femfunc",
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"name" : "FemProject",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "Linal2::@67e2bff03f121bc69b54",
+					"jsonFile" : "target-Linal2-Release-248968bafa6f23f3a036.json",
+					"name" : "Linal2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "VTKfile::@48f3ef6dd308c5d99ec5",
+					"jsonFile" : "target-VTKfile-Release-eb9132e9b034d0e038ed.json",
+					"name" : "VTKfile",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "femfunc::@1a0cc87a2b1b38bd7b59",
+					"jsonFile" : "target-femfunc-Release-9bc808de2e538801f14a.json",
+					"name" : "femfunc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "main::@653c8da37dcad33d1e2c",
+					"jsonFile" : "target-main-Release-3118e679396bf1768bdc.json",
+					"name" : "main",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "simplecuda::@a3b07938f09d8d899e25",
+					"jsonFile" : "target-simplecuda-Release-131bb81e84e28a99213c.json",
+					"name" : "simplecuda",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release",
+		"source" : "C:/Users/mokin/Desktop/cuda-template-master3D/cuda-template-master"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

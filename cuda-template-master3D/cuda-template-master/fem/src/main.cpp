@@ -352,7 +352,63 @@ void MakeVTKfile(std::string output_vtk,
 }
 
 
+void MakeVTKfileNew(std::string output_vtk,
+                 MyArray nodesX,
+                 MyArray nodesY,
+                 MyArray nodesZ,
+                 std::vector<ElementLight> elements,
+                 MyArray displacements) {
+    fstream outvtk;
+    outvtk.open(output_vtk, fstream::out);
+    outvtk << "# vtk DataFile Version 1.0\nresults.vtk  3D Unstructured Grid of Triangles\nASCII\n\nDATASET UNSTRUCTURED_GRID\nPOINTS "
+           << nodesX.get_size() << " float\n";
+    for (int i = 0; i < nodesX.get_size(); i++) {
+        outvtk << nodesX[i] << " " << nodesY[i] << " " << nodesZ[i] << "\n";
+    }
 
+    outvtk << "CELLS " << elements.size() << " " << elements.size() * 5 << "\n";
+    for (int i = 0; i < elements.size(); i++) {
+        outvtk << 4 << " " << elements[i].nodesIds[0] << " " << elements[i].nodesIds[1] << " " << elements[i].nodesIds[2] << " " << elements[i].nodesIds[3] << "\n";
+    }
+
+    outvtk << "CELL_TYPES " << elements.size() << "\n";
+    for (int i = 0; i < elements.size(); i++) {
+        outvtk << 10 << "\n";
+    }
+
+    outvtk << "\nPOINT_DATA " << nodesX.get_size() << "\n";
+
+    outvtk << "\nVECTORS displacements float\n";
+    for (int i = 0; i < displacements.get_size() - 2; i += 3) {
+        outvtk << displacements[i] << " " << displacements[i + 1] << " " << displacements[i + 2] << "\n";
+    }
+
+    outvtk << "\nSCALARS summary float\nLOOKUP_TABLE default\n";
+    for (int i = 0; i < displacements.get_size() - 2; i += 3) {
+        outvtk << std::sqrt(displacements[i] * displacements[i] + displacements[i + 1] * displacements[i + 1] + displacements[i + 2] * displacements[i + 2]) << "\n";
+    }
+
+//    outvtk << "\nCELL_DATA " << elements.size() << "\n";
+//    outvtk << "VECTORS stress float\n";
+//    for (int i = 0; i < Stress.size(); i++) {
+//        outvtk << Stress[i][0] << " " << Stress[i][1] << " " << Stress[i][2] << " " << Stress[i][3] << " " << Stress[i][4] << " " << Stress[i][5] << "\n";
+//    }
+
+//    outvtk << "\nSCALARS mises_stress float\nLOOKUP_TABLE default\n";
+//    for (int i = 0; i < sigma_mises.size(); i++) {
+//        outvtk << sigma_mises[i] << "\n";
+//    }
+
+//    outvtk << "\nVECTORS deformation float\n";
+//    for (int i = 0; i < Deformation.size(); i++) {
+//        outvtk << Deformation[i][0] << " " << Deformation[i][1] << " " << Deformation[i][2] << " " << Deformation[i][3] << " " << Deformation[i][4] << " " << Deformation[i][5] << "\n";
+//    }
+
+//    outvtk << "\nSCALARS mises_deformation float\nLOOKUP_TABLE default\n";
+//    for (int i = 0; i < epsilon_mises.size(); i++) {
+//        outvtk << epsilon_mises[i] << "\n";
+//    }
+}
 
 
 
@@ -360,12 +416,12 @@ void MakeVTKfile(std::string output_vtk,
 
 int main(void) {
 
-    std::string name = "bulk_test";
+    std::string name = "cilinder_middle";
 
 
-    std::string directory = "D:/FiniteElementMethod3D/prepared_meshes/";
-    std::string output_vtk = "D:/FiniteElementMethod3D/final_results/results.vtk";
-    std::string output_results = "D:/FiniteElementMethod3D/final_results/output.txt";
+    std::string directory = "C:/Users/mokin/Desktop/FiniteElementMethod3D/prepared_meshes/";
+    std::string output_vtk = "C:/Users/mokin/Desktop/FiniteElementMethod3D/final_results/results.vtk";
+    std::string output_results = "C:/Users/mokin/Desktop/FiniteElementMethod3D/final_results/output.txt";
 
     fstream nodes_file, elements_file, loads_file, constraints_file, outfile;
     nodes_file.open(directory + name + "/nodes.txt", fstream::in);
@@ -404,13 +460,13 @@ int main(void) {
 //    cout<<"\n";
 //    nodesZ.Show();
 
-    std::vector<Element>   	elements;
+    std::vector<ElementLight>   	elements;
     std::vector<Constraint>	constraints;
 
     int elementCount;
     elements_file >> elementCount;
     for (int i = 0; i < elementCount; ++i) {
-        Element element;
+        ElementLight element;
         elements_file >> element.nodesIds[0] >> element.nodesIds[1] >> element.nodesIds[2] >> element.nodesIds[3];
         elements.push_back(element);
     }
@@ -449,17 +505,31 @@ int main(void) {
         ///////////////////////////
 
 
+    std::vector<ElementLight> elementsColor(elementCount);
+    std::vector<ElementLight> elementsTemp = elements;
 
-
-
-    std::vector<Element> elementsColor;
-    std::vector<Element> elementsTemp = elements;
     std::vector<int> elementsOrderColor;
 
-    FindSetsColor(elementsTemp, elementsColor, elementsOrderColor);
+    //FindSetsColor(elementsTemp, elementsColor, elementsOrderColor);
+
+    int *colors = new int[elementCount];
+    FindColors(elements, colors, elementCount);
+
+    FindSetsColorSuperNew(elementsTemp, elementsColor, elementsOrderColor);
+
+//    int *nodesDegrees = new int[nodesCount];
+//    int *allcolors = new int[elementCount];
+//    for (int i = 0; i < nodesCount; i++) {
+//        nodesDegrees[i] = 0;
+//    }
+
+//    FindSetsColorNew(elements, allcolors, nodesDegrees, nodesCount);
+    //cout << "COUNT OF CONNECTIVITY = " << count << endl;
+
 
     end_time = clock();
-        cout<< "\nTime(FindSetsColor): "<< end_time - start_time<< " ms\n";
+    cout<< "\nTime(FindSetsColor): "<< end_time - start_time<< " ms\n";
+
 
 //    for (int i = 0; i < elementsOrderColor.size(); i++) {
 //        cout << elementsOrderColor[i] << " : " << elementsColor[];
@@ -512,8 +582,34 @@ int main(void) {
         elementsOrderColorCuda[i] = elementsOrderColor[i];
     }
 
+    int *ConnectMatrix = new int[nodesCount * nodesCount];
+    int *rowSizes = new int[3 * nodesCount];
+    int finalSize = FindConnectivityMatrix(ConnectMatrix, rowSizes, elementsCuda, elementId0color, elementId1color, elementId2color, elementId3color, nodesCount, elementCount);
+
+    end_time = clock();
+    cout<< "\nTime(FindConnectMatrix): "<< end_time - start_time<< " ms\n";
+
+    int *x_s = new int[9 * finalSize];
+    int *y_s = new int[9 * finalSize];
+    float *values = new float[9 * finalSize];
+    CreateStiffStructure(ConnectMatrix, x_s, y_s, finalSize, nodesCount);
+
+    end_time = clock();
+    cout<< "\nTime(CreateStiffStructure): "<< end_time - start_time<< " ms\n";
+
+    SortCOO(x_s, y_s, values, 3 * nodesCount, 9 * finalSize);
+//    for (int i = 0; i < 9 * finalSize; i++) {
+//        cout << x_s[i] << " " << y_s[i] << endl;
+//    }
+    delete [] ConnectMatrix;
+
+
 //    FindNonZeroNumbers(elementId0color, elementId1color, elementId2color, elementId3color, elementCount,
 //                       nodesXcuda, nodesYcuda, nodesZcuda, nodesCount);
+
+    end_time = clock();
+    cout<< "\nTime(SortCOO): "<< end_time - start_time<< " ms\n";
+
 
     std::vector<int>  indicesToConstraint;
 
@@ -535,13 +631,14 @@ int main(void) {
 //    cout << "PreSparseSize = " << Sparse.size() << endl;
 //    end_time = clock();
 //    cout<< "Time(FindSparseSize): "<< end_time - start_time<< " ms\n\n";
+    MyArray displacementsGPU(3 * nodesCount);
 
-
-    FiniteElementMethodCUDA(D.get_data(), elementsCuda,
+    FiniteElementMethodCUDA2(x_s, y_s, rowSizes, D.get_data(), elementsCuda,
                             elementId0color, elementId1color, elementId2color, elementId3color, elementCount,
                             nodesX.get_data(), nodesY.get_data(), nodesZ.get_data(), nodesCount, elementsOrderColorCuda, elementsOrderColor.size(),
-                            constraintsId, constraintsCount, loads.get_data());
+                            constraintsId, constraintsCount, loads.get_data(), 9 * finalSize, displacementsGPU.get_data());
 
+    MakeVTKfileNew(output_vtk, nodesX, nodesY, nodesZ, elements, displacementsGPU);
 
     end_time = clock();
     cout<< "\nTime(CUDACUDACUDA): "<< end_time - start_time<< " ms\n";
@@ -550,6 +647,7 @@ int main(void) {
 
 
     ///////////////////////////
+
 /*
     std::vector<Triplet> triplets;
     for (std::vector<Element>::iterator it = elements.begin(); it != elements.end(); ++it)
@@ -709,10 +807,11 @@ int main(void) {
     std::vector<float> epsilon_mises;
     //CalculateStressAndDeformation(Deformation, Stress, epsilon_mises, sigma_mises, D, elements, displacements);
 
-    MakeVTKfile(output_vtk, nodesX, nodesY, nodesZ, elements, displacements, Stress, sigma_mises, Deformation, epsilon_mises);
+    //MakeVTKfile(output_vtk, nodesX, nodesY, nodesZ, elements, displacements, Stress, sigma_mises, Deformation, epsilon_mises);
     MakeVTKfile2(D);
 
 
-    */
+*/
+
     return 0;
 }

@@ -1,0 +1,17 @@
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/CMakeFiles/rebuild_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/Linal2/CMakeFiles/rebuild_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/Linal2/CMakeFiles/Linal2.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/Linal2/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/CudaLib/CMakeFiles/simplecuda.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/CudaLib/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/CudaLib/CMakeFiles/rebuild_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/fem/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/fem/CMakeFiles/main.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/fem/CMakeFiles/rebuild_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/VTKfile/CMakeFiles/VTKfile.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/VTKfile/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/VTKfile/CMakeFiles/rebuild_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/femfunc/CMakeFiles/femfunc.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/femfunc/CMakeFiles/edit_cache.dir
+C:/Users/mokin/Desktop/cuda-template-master3D/build-cuda-template-master-Desktop_x86_windows_msvc2019_pe_64bit-Release/femfunc/CMakeFiles/rebuild_cache.dir

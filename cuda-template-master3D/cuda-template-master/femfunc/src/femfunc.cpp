@@ -5,13 +5,192 @@
 
 using namespace std;
 
+
+void FindColors(std::vector<ElementLight> elements, int *colors, int elementsCount) {
+    for (int i = 0; i < elementsCount; i++) {
+        colors[i] = -1;
+    }
+    //problema v tom chto sravnenie tolko s pervim elementom of color, a nado so vsemi!!!
+    int currColor = 0, counter = 1;
+    bool addnew = true;
+
+    for (int i = 0; i < elementsCount; i++) {
+        if (colors[i] == -1) {
+            colors[i] = currColor;
+            for (int k = i + 1; k < elementsCount; k++) {
+                for (int j = 0; j < counter; j++) {
+                    for (int t = 0; t < 4; t++) {
+                        for (int p = 0; p < 4; p++) {
+                            if (elements[k].nodesIds[t] == elements[j].nodesIds[p]) {
+                                addnew = false;
+                            }
+                        }
+                    }
+                }
+                if (addnew) {
+                    colors[k] = currColor;
+                    counter++;
+                }
+                addnew = true;
+            }
+            counter = 0;
+            currColor++;
+        }
+    }
+
+    cout << "FindColors result = " << currColor << endl;
+//    for (int i = 0; i < elementsCount; i++) {
+//        cout << colors[i] << " ";
+//    }
+    cout << endl;
+}
+
+void CreateStiffStructure(int *ConnectMatrix, int *x, int *y, int size, int nodesCount) {
+    int index = 0;
+    for (int i = 0; i < nodesCount; i++) {
+        for (int j = 0; j < nodesCount; j++) {
+            if (ConnectMatrix[j + i * nodesCount]) {
+                for (int k = 0; k < 3; k++) {
+                    x[index + 3 * k + 0] = 3 * i + k;
+                    x[index + 3 * k + 1] = 3 * i + k;
+                    x[index + 3 * k + 2] = 3 * i + k;
+
+                    y[index + 3 * k + 0] = 3 * j + 0;
+                    y[index + 3 * k + 1] = 3 * j + 1;
+                    y[index + 3 * k + 2] = 3 * j + 2;
+                }
+//                x[index + 0] = i;
+//                x[index + 1] = i + 1;
+//                x[index + 2] = i + 2;
+//                x[index + 3] = j;
+//                x[index + 4] = j + 1;
+//                x[index + 5] = j + 2;
+
+//                y[index + 0] = j;
+//                y[index + 1] = j + 1;
+//                y[index + 2] = j + 2;
+//                y[index + 3] = i;
+//                y[index + 4] = i + 1;
+//                y[index + 5] = i + 2;
+
+                index += 9;
+            }
+        }
+    }
+    cout << "CHECK CREATE STIFF MATRIX = " << index << endl;
+}
+
+int FindConnectivityMatrix(int *ConnectMatrix, int *rowSizes, int *elements, int *element0, int *element1, int *element2, int *element3, int nodesCount, int elementsCount) {
+    int size = nodesCount;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            ConnectMatrix[j + i * size] = 0;
+        }
+    }
+//    cout << "success1\n";
+//    for (int k = 0; k < 4 * elementsCount - 3; k += 4) {
+//        for (int i = 0; i < 4; i++) {
+//            for (int j = 0; j < 4; j++) {
+//                ConnectMatrix[3 * elements[k + j] + 0 + (3 * elements[k + i] + 0) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 1 + (3 * elements[k + i] + 0) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 2 + (3 * elements[k + i] + 0) * size] = 1;
+
+//                ConnectMatrix[3 * elements[k + j] + 0 + (3 * elements[k + i] + 1) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 1 + (3 * elements[k + i] + 1) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 2 + (3 * elements[k + i] + 1) * size] = 1;
+
+//                ConnectMatrix[3 * elements[k + j] + 0 + (3 * elements[k + i] + 2) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 1 + (3 * elements[k + i] + 2) * size] = 1;
+//                ConnectMatrix[3 * elements[k + j] + 2 + (3 * elements[k + i] + 2) * size] = 1;
+//            }
+//        }
+//    }
+
+//    cout << "success2\n";
+
+//    for (int i = 0; i < nodesCount; i++) {
+//        for (int j = 0; j < elementsCount; j++) {
+//            if (i == element0[j] || i == element1[j] || i == element2[j] || i == element3[j]) {
+//                ConnectMatrix[element0[j] + i * nodesCount] = 1;
+//                ConnectMatrix[element1[j] + i * nodesCount] = 1;
+//                ConnectMatrix[element2[j] + i * nodesCount] = 1;
+//                ConnectMatrix[element3[j] + i * nodesCount] = 1;
+//            }
+//        }
+//    }
+
+
+    for (int i = 0; i < elementsCount; i++) {
+        ConnectMatrix[element0[i] + element1[i] * size] = 1;
+        ConnectMatrix[element0[i] + element2[i] * size] = 1;
+        ConnectMatrix[element0[i] + element3[i] * size] = 1;
+
+        ConnectMatrix[element1[i] + element0[i] * size] = 1;
+        ConnectMatrix[element1[i] + element2[i] * size] = 1;
+        ConnectMatrix[element1[i] + element3[i] * size] = 1;
+
+        ConnectMatrix[element2[i] + element0[i] * size] = 1;
+        ConnectMatrix[element2[i] + element1[i] * size] = 1;
+        ConnectMatrix[element2[i] + element3[i] * size] = 1;
+
+        ConnectMatrix[element3[i] + element0[i] * size] = 1;
+        ConnectMatrix[element3[i] + element1[i] * size] = 1;
+        ConnectMatrix[element3[i] + element2[i] * size] = 1;
+
+        ConnectMatrix[element0[i] + element0[i] * size] = 1;
+        ConnectMatrix[element1[i] + element1[i] * size] = 1;
+        ConnectMatrix[element2[i] + element2[i] * size] = 1;
+        ConnectMatrix[element3[i] + element3[i] * size] = 1;
+    }
+
+    int k = 0, temp = 0;
+
+    for (int i = 0; i < size; i++) {
+        rowSizes[3 * i] = 0;
+        for (int j = 0; j < size; j++) {
+            if (ConnectMatrix[j + i * size]) {
+                k++;
+                rowSizes[3 * i]++;
+            }
+                //cout << ConnectMatrix[j + i * size] << " ";
+        }
+        rowSizes[3 * i] *= 3;
+
+        if (i == 0) {
+            rowSizes[1] = 2 * rowSizes[0];
+            rowSizes[2] = 3 * rowSizes[0];
+        } else {
+            temp = rowSizes[3 * i];
+            rowSizes[3 * i] += rowSizes[3 * i - 1];
+            rowSizes[3 * i + 1] = temp + rowSizes[3 * i];
+            rowSizes[3 * i + 2] = 2 * temp + rowSizes[3 * i];
+        }
+        //cout << endl;
+    }
+
+//    for (int i = 0; i < 3 * nodesCount; i++) {
+//        cout << rowSizes[i] << " ";
+//    }
+
+    cout << "ConnectSize = " << k << endl;
+
+    return k;
+}
+
 void FindNonZeroNumbers(int *element0, int *element1, int *element2, int *element3, int elementCount,
                         float *nodesXcuda, float *nodesYcuda, float *nodesZcuda, int nodesCount) {
     int k = 0;
     for (int i = 0; i < nodesCount; i++) {
         for (int j = 0; j < elementCount; j++) {
-            if (i == element0[j] || i == element1[j] || i == element2[j] || i == element3[j]) {
-                k += 4 * 3;
+            for (int t = 0; t < 4; t++) {
+                for (int p = 0; p < 4; p++) {
+                    if (element0[i + t] == element0[j + p] ||
+                            element0[i + t] == element1[j + p] ||
+                            element0[i + t] == element2[j + p] ||
+                            element0[i + t] == element3[j + p]) {
+                        k++;
+                    }
+                }
             }
         }
     }
@@ -60,6 +239,73 @@ void FindSetsColor(std::vector<Element> &elements, std::vector<Element> &element
         i = 0;
     }
 }
+
+void FindSetsColorSuperNew(std::vector<ElementLight> &elements, std::vector<ElementLight> &elementsColor, std::vector<int> &elementsOrderColor) {
+
+    int k = 0, k_prev = 0, i = 0, counter = 0;
+    const int size = elements.size();
+    bool add;
+
+    while (counter != size) {
+        while (i < elements.size()) {
+            add = true;
+            for (int j = k_prev; j < k + k_prev; j++) {
+                for (int t = 0; t < 4; t++) {
+                    for (int p = 0; p < 4; p++) {
+                        if (elements[i].nodesIds[t] == elementsColor[j].nodesIds[p] ||
+                                elements[i].nodesIds[t] == elementsColor[j].nodesIds[p] ||
+                                elements[i].nodesIds[t] == elementsColor[j].nodesIds[p] ||
+                                elements[i].nodesIds[t] == elementsColor[j].nodesIds[p]) {
+                            add = false;
+                        }
+                    }
+                }
+            }
+            if (add == true) {
+                //elementsColor.push_back(elements[i]);
+                elementsColor[counter] = elements[i];
+                counter++;
+//                cout << elements[i].nodesIds[0] << " "
+//                        << elements[i].nodesIds[1] << " "
+//                        << elements[i].nodesIds[2] << " "
+//                        << elements[i].nodesIds[3] << endl;
+                elements.erase(elements.begin() + i);
+                k++;
+            } else {
+                i++;
+            }
+        }
+        cout << k << " ";
+        elementsOrderColor.push_back(k);
+        k_prev += k;
+        k = 0;
+        i = 0;
+    }
+}
+
+int comp(const void *i, const void *j) {
+  return *(int *)j - *(int *)i;
+}
+
+void FindSetsColorNew(std::vector<Element> &elements, int *allcolors, int *nodesDegrees, int nodesCount) {
+    //int count = 0;
+//    for (int i = 0; i < nodesCount; i++) {
+//        for (int j = 0; j < elements.size(); j++) {
+//            if (i == elements[j].nodesIds[0] || i == elements[j].nodesIds[1] || i == elements[j].nodesIds[2] || i == elements[j].nodesIds[3]) {
+//                nodesDegrees[i]++;
+//            }
+//        }
+//        //count += nodesDegrees[i];
+//    }
+//    qsort(nodesDegrees, nodesCount, sizeof(int), comp);
+
+
+
+
+
+    //return count;
+}
+
 
 
 void Element::FindSparseSize(std::vector<couple> &Sparse) {
